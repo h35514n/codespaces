@@ -61,30 +61,27 @@ git_color() {
 }
 
 git_branch() {
-  local git_status
-  local is_on_branch
-  local is_on_commit
-  local is_rebasing
+  git_status="$(git status 2> /dev/null)"
+  local is_on_branch='^(On branch|En la rama) ([^[:space:]]+)'
+  local is_on_commit='HEAD (detached at|desacoplada en) ([^[:space:]]+)'
+  local is_rebasing="(rebasing branch|rebase de la rama) '([^[:space:]]+)' (on|sobre) '([^[:space:]]+)'"
+  local branch
+  local commit
 
-  git_status="$(\git status 2> /dev/null)"
-  is_on_branch='^On branch ([^[:space:]]+)'
-  is_on_commit='HEAD detached at ([^[:space:]]+)'
-  is_rebasing="rebasing branch '([^[:space:]]+)' on '([^[:space:]]+)'"
-
-  if [[ $git_status =~ $is_on_branch ]]; then
-    local branch=${BASH_REMATCH[1]:-${match[1]}} # bash/zsh portable
-    if [[ $git_status =~ "Unmerged paths" ]]; then
-      printf "merging into $branch "
+  if [[ ${git_status} =~ ${is_on_branch} ]]; then
+    branch=${match[2]:-${BASH_REMATCH[2]}}  # Zsh/bash portable
+    if [[ ${git_status} =~ (Unmerged paths|no fusionadas) ]]; then
+      git_color && echo -n "merging into ${branch} "
     else
-      printf "$branch "
+      git_color && echo -n "${branch} "
     fi
-  elif [[ $git_status =~ $is_on_commit ]]; then
-    local commit=${BASH_REMATCH[1]:-${match[1]}}
-    printf "$commit "
-  elif [[ $git_status =~ $is_rebasing ]]; then
-    local branch=${BASH_REMATCH[1]:-${match[1]}}
-    local commit=${BASH_REMATCH[2]:-${match[2]}}
-    printf "rebasing $branch on $commit "
+  elif [[ ${git_status} =~ ${is_on_commit} ]]; then
+    commit=${match[2]:-${BASH_REMATCH[2]}}
+    git_color && echo -n "${commit} "
+  elif [[ ${git_status} =~ ${is_rebasing} ]]; then
+    branch=${match[2]:-${BASH_REMATCH[2]}}
+    commit=${match[4]:-${BASH_REMATCH[4]}}
+    git_color && echo -n "rebasing ${branch} onto ${commit} "
   fi
 }
 
