@@ -104,11 +104,11 @@ git_branch() {
 git_prompt() {
   local prompt=''
 
-  if [[ -n "${SSH_CONNECTION}" ]]; then
+  if [[ -n "${SSH_CONNECTION-}" ]]; then
     prompt+="$(color gray)\u@\h$(color reset)\n"
   fi
 
-  if [[ -z "${VIRTUAL_ENV}" && -z "${CONDA_PROMPT_MODIFIER}" ]]; then
+  if [[ -z "${VIRTUAL_ENV-}" && -z "${CONDA_PROMPT_MODIFIER-}" ]]; then
     prompt+="$(color blue)\W$(color reset) "
   else
     prompt+="$(color orange)\W$(color reset) "
