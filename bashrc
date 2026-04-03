@@ -114,7 +114,6 @@ export PS1="$(git_prompt)"
 #-------------------------------------------------------------
 export EDITOR="vim"
 export LESS=' --no-init --RAW-CONTROL-CHARS --quit-if-one-screen '  # Less options: no init, raw chars, quit if one screen
-export LESSOPEN="| src-hilite-lesspipe.sh %s"  # Syntax highlighting for less
 export PAGER="less"
 
 export FZF_DEFAULT_OPTS="
