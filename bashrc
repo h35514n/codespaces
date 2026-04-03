@@ -125,7 +125,7 @@ export FZF_DEFAULT_OPTS="
   --bind='ctrl-f:preview-down'
   --bind='ctrl-b:preview-up'
 "
-export FZF_DEFAULT_COMMAND="fdfind --hidden --type f --exclude .git --exclude node_modules"
+export FZF_DEFAULT_COMMAND="fd --hidden --type f --exclude .git --exclude node_modules"
 export FZF_CTRL_T_COMMAND="${FZF_DEFAULT_COMMAND}"
 
 #-------------------------------------------------------------

@@ -51,6 +51,8 @@ link_as_dotfile "gitconfig"
 link_as_dotfile "tmux.conf"
 link_as_dotfile "vimrc"
 
+ln -s "$(command -v fdfind)" ~/.bin/fd
+
 if [ "${CODESPACES:-}" = "true" ]; then
   echo "-*- Running inside GitHub Codespaces -*-"
 fi
