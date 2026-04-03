@@ -177,4 +177,4 @@ bind '"\e[B": history-search-forward'
 #-------------------------------------------------------------
 # INIT SCRIPTS
 #-------------------------------------------------------------
-. ./scripts/fzf-completion.bash
+fzf-completion-init
