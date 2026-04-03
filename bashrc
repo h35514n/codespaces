@@ -173,3 +173,8 @@ alias pp='pretty-print-path'  # Pretty-print PATH variable
 #-------------------------------------------------------------
 bind '"\e[A": history-search-backward'
 bind '"\e[B": history-search-forward'
+
+#-------------------------------------------------------------
+# INIT SCRIPTS
+#-------------------------------------------------------------
+. ./scripts/fzf-completion.bash
