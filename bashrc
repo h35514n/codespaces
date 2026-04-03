@@ -95,7 +95,7 @@ git_prompt() {
     prompt+="$(color gray)\u@\h$(color reset)\n"
   fi
 
-  if [[ -z "${VIRTUAL_ENV}" ]]; then
+  if [[ -z "${VIRTUAL_ENV}" ]] && [[ -z "${CONDA_PROMPT_MODIFIER}" ]]; then
     prompt+="$(color blue)\W$(color reset) "
   else
     prompt+="$(color orange)\W$(color reset) "
