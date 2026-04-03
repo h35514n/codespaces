@@ -31,7 +31,8 @@ if command -v apt-get >/dev/null 2>&1; then
         docker-ce \
         docker-ce-cli \
         docker-compose-plugin \
-        eza\
+        eza \
+        fd-find \
         fzf \
         git \
         git-delta \
