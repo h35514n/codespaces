@@ -131,7 +131,7 @@ export FZF_CTRL_T_COMMAND="${FZF_DEFAULT_COMMAND}"
 # PATH
 #-------------------------------------------------------------
 PATH="${HOME}/.bin"
-PATH+="${HOME}/.bin/git"
+PATH+=":${HOME}/.bin/git"
 PATH+=":${HOME}/miniconda3/bin"
 PATH+=":${HOME}/miniconda3/condabin"
 PATH+=":/usr/local/sbin"
