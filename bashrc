@@ -7,82 +7,107 @@ md() {
   cd "${directory_name}" || return
 }
 
-fg_no_bold[orange]=$'\e[38;5;208m'
-fg[orange]=$'\e[38;5;208m'
+#-------------------------------------------------------------
+# PROMPT
+#-------------------------------------------------------------
+declare -A fg_no_bold
+fg_no_bold[red]='\[\e[31m\]'
+fg_no_bold[yellow]='\[\e[33m\]'
+fg_no_bold[green]='\[\e[32m\]'
+fg_no_bold[magenta]='\[\e[35m\]'
+fg_no_bold[blue]='\[\e[34m\]'
+fg_no_bold[white]='\[\e[37m\]'
+fg_no_bold[gray]='\[\e[90m\]'
+fg_no_bold[orange]='\[\e[38;5;208m\]'
+
+reset_color='\[\e[0m\]'
+
 color() {
-  case $1 in
-    red)    printf "%s" "%{${fg_no_bold[red]}%}" ;;
-    yellow) printf "%s" "%{${fg_no_bold[yellow]}%}" ;;
-    green)  printf "%s" "%{${fg_no_bold[green]}%}" ;;
-    violet) printf "%s" "%{${fg_no_bold[magenta]}%}" ;;
-    blue)   printf "%s" "%{${fg_no_bold[blue]}%}" ;;
-    orange) printf "%s" "%{${fg_no_bold[orange]}%}" ;;
-    white)  printf "%s" "%{${fg_no_bold[white]}%}" ;;
-    gray)   printf "%s" "%{${fg_no_bold[gray]}%}" ;;
-    reset)  printf "%s" "%{${reset_color}%}" ;;
+  case "$1" in
+    red)    printf '%s' "${fg_no_bold[red]}" ;;
+    yellow) printf '%s' "${fg_no_bold[yellow]}" ;;
+    green)  printf '%s' "${fg_no_bold[green]}" ;;
+    violet) printf '%s' "${fg_no_bold[magenta]}" ;;
+    blue)   printf '%s' "${fg_no_bold[blue]}" ;;
+    orange) printf '%s' "${fg_no_bold[orange]}" ;;
+    white)  printf '%s' "${fg_no_bold[white]}" ;;
+    gray)   printf '%s' "${fg_no_bold[gray]}" ;;
+    reset)  printf '%s' "${reset_color}" ;;
   esac
 }
 
 git_color() {
-  git_status="$(git status 2> /dev/null)"
+  local git_status
+  git_status="$(git status 2>/dev/null)" || return
+
   case "${git_status}" in
-    *'not staged'* | *'to be committed'* | *'untracked files present'* |\
+    *'not staged'* | *'to be committed'* | *'untracked files present'* | \
     *'no rastreados'* | *'archivos sin seguimiento'* | *'a ser confirmados'*)
-      echo -ne "$(color red)"
+      printf '%s' "$(color red)"
       ;;
-    *'branch is ahead of'* | *'have diverged'* |\
+    *'branch is ahead of'* | *'have diverged'* | \
     *'rama está adelantada'* | *'rama está detrás de'* | *'han divergido'*)
-      echo -ne "$(color yellow)"
+      printf '%s' "$(color yellow)"
       ;;
     *'working '*' clean'* | *'está limpio'*)
-      echo -ne "$(color green)"
+      printf '%s' "$(color green)"
       ;;
     *'Unmerged'* | *'no fusionadas'* | *'rebase interactivo en progreso'*)
-      echo -ne "$(color violet)"
+      printf '%s' "$(color violet)"
       ;;
     *)
-      echo -ne "$(color white)"
+      printf '%s' "$(color white)"
       ;;
   esac
 }
 
 git_branch() {
-  git_status="$(git status 2> /dev/null)"
+  local git_status
   local is_on_branch='^(On branch|En la rama) ([^[:space:]]+)'
-  local is_on_commit='HEAD (detached at|desacoplada en) ([^[:space:]]+)'
+  local is_on_commit='^HEAD (detached at|desacoplada en) ([^[:space:]]+)'
   local is_rebasing="(rebasing branch|rebase de la rama) '([^[:space:]]+)' (on|sobre) '([^[:space:]]+)'"
   local branch
   local commit
 
+  git_status="$(git status 2>/dev/null)" || return
+
   if [[ ${git_status} =~ ${is_on_branch} ]]; then
-    branch=${match[2]:-${BASH_REMATCH[2]}}  # Zsh/bash portable
-    if [[ ${git_status} =~ (Unmerged paths|no fusionadas) ]]; then
-      git_color && echo -n "merging into ${branch} "
+    branch="${BASH_REMATCH[2]}"
+    if [[ ${git_status} =~ (Unmerged\ paths|no\ fusionadas) ]]; then
+      printf '%smerging into %s ' "$(git_color)" "${branch}"
     else
-      git_color && echo -n "${branch} "
+      printf '%s%s ' "$(git_color)" "${branch}"
     fi
   elif [[ ${git_status} =~ ${is_on_commit} ]]; then
-    commit=${match[2]:-${BASH_REMATCH[2]}}
-    git_color && echo -n "${commit} "
+    commit="${BASH_REMATCH[2]}"
+    printf '%s%s ' "$(git_color)" "${commit}"
   elif [[ ${git_status} =~ ${is_rebasing} ]]; then
-    branch=${match[2]:-${BASH_REMATCH[2]}}
-    commit=${match[4]:-${BASH_REMATCH[4]}}
-    git_color && echo -n "rebasing ${branch} onto ${commit} "
+    branch="${BASH_REMATCH[2]}"
+    commit="${BASH_REMATCH[4]}"
+    printf '%srebasing %s onto %s ' "$(git_color)" "${branch}" "${commit}"
   fi
 }
 
 git_prompt() {
-  local prompt
-  prompt=${SSH_CONNECTION:+$(color gray)%n@%m$(color reset)$'\n'}
-  if [[ -z "${VIRTUAL_ENV}" ]]; then
-    PROMPT+="$(color blue)%c$(color reset) "
-  else
-    PROMPT+="$(color orange)%c$(color reset) "
+  local prompt=''
+
+  if [[ -n "${SSH_CONNECTION}" ]]; then
+    prompt+="$(color gray)\u@\h$(color reset)\n"
   fi
-  prompt+='$(git_branch)'                    # Git branch/commit with color
-  prompt+='$(color reset)%# '                # Reset and prompt symbol
-  echo "${prompt}"
+
+  if [[ -z "${VIRTUAL_ENV}" ]]; then
+    prompt+="$(color blue)\W$(color reset) "
+  else
+    prompt+="$(color orange)\W$(color reset) "
+  fi
+
+  prompt+='$(git_branch)'
+  prompt+="$(color reset)\\$ "
+
+  printf '%s' "${prompt}"
 }
+
+PS1='$(git_prompt)'
 
 #-------------------------------------------------------------
 # ENV vars
@@ -91,7 +116,6 @@ export EDITOR="vim"
 export LESS=' --no-init --RAW-CONTROL-CHARS --quit-if-one-screen '  # Less options: no init, raw chars, quit if one screen
 export LESSOPEN="| src-hilite-lesspipe.sh %s"  # Syntax highlighting for less
 export PAGER="less"
-export PS1="$(git_prompt)"
 
 export FZF_DEFAULT_OPTS="
   --no-multi
