@@ -11,15 +11,15 @@ md() {
 # PROMPT
 #-------------------------------------------------------------
 declare -A fg_no_bold
-fg_no_bold[red]=$'\e[31m'
-fg_no_bold[yellow]=$'\e[33m'
-fg_no_bold[green]=$'\e[32m'
-fg_no_bold[magenta]=$'\e[35m'
-fg_no_bold[blue]=$'\e[34m'
-fg_no_bold[white]=$'\e[37m'
-fg_no_bold[gray]=$'\e[90m'
-fg_no_bold[orange]=$'\e[38;5;208m'
-reset_color=$'\e[0m'
+fg_no_bold[red]='\[\e[31m\]'
+fg_no_bold[yellow]='\[\e[33m\]'
+fg_no_bold[green]='\[\e[32m\]'
+fg_no_bold[magenta]='\[\e[35m\]'
+fg_no_bold[blue]='\[\e[34m\]'
+fg_no_bold[white]='\[\e[37m\]'
+fg_no_bold[gray]='\[\e[90m\]'
+fg_no_bold[orange]='\[\e[38;5;208m\]'
+reset_color='\[\e[0m\]'
 
 color() {
   case "$1" in
@@ -61,27 +61,29 @@ git_color() {
 }
 
 git_branch() {
-  git_status="$(git status 2> /dev/null)"
+  local git_status
+  git_status="$(git status 2>/dev/null)" || return
+
   local is_on_branch='^(On branch|En la rama) ([^[:space:]]+)'
-  local is_on_commit='HEAD (detached at|desacoplada en) ([^[:space:]]+)'
+  local is_on_commit='HEAD \(detached at|desacoplada en\) ([^[:space:]]+)'
   local is_rebasing="(rebasing branch|rebase de la rama) '([^[:space:]]+)' (on|sobre) '([^[:space:]]+)'"
   local branch
   local commit
 
   if [[ ${git_status} =~ ${is_on_branch} ]]; then
-    branch=${match[2]:-${BASH_REMATCH[2]}}  # Zsh/bash portable
+    branch="${BASH_REMATCH[2]}"
     if [[ ${git_status} =~ (Unmerged paths|no fusionadas) ]]; then
-      git_color && echo -n "merging into ${branch} "
+      printf '%smerging into %s ' "$(git_color)" "${branch}"
     else
-      git_color && echo -n "${branch} "
+      printf '%s%s ' "$(git_color)" "${branch}"
     fi
   elif [[ ${git_status} =~ ${is_on_commit} ]]; then
-    commit=${match[2]:-${BASH_REMATCH[2]}}
-    git_color && echo -n "${commit} "
+    commit="${BASH_REMATCH[2]}"
+    printf '%s%s ' "$(git_color)" "${commit}"
   elif [[ ${git_status} =~ ${is_rebasing} ]]; then
-    branch=${match[2]:-${BASH_REMATCH[2]}}
-    commit=${match[4]:-${BASH_REMATCH[4]}}
-    git_color && echo -n "rebasing ${branch} onto ${commit} "
+    branch="${BASH_REMATCH[2]}"
+    commit="${BASH_REMATCH[4]}"
+    printf '%srebasing %s onto %s ' "$(git_color)" "${branch}" "${commit}"
   fi
 }
 
@@ -92,19 +94,19 @@ git_prompt() {
     prompt+="$(color gray)\u@\h$(color reset)\n"
   fi
 
-  if [[ -z "${VIRTUAL_ENV}" ]] && [[ -z "${CONDA_PROMPT_MODIFIER}" ]]; then
+  if [[ -z "${VIRTUAL_ENV}" && -z "${CONDA_PROMPT_MODIFIER}" ]]; then
     prompt+="$(color blue)\W$(color reset) "
   else
     prompt+="$(color orange)\W$(color reset) "
   fi
 
-  prompt+='$(git_branch)'
-  prompt+="$(color reset)\\$ "
+  prompt+="$(git_branch)"
+  prompt+="$(color reset)\$ "
 
-  printf '%s' "${prompt}"
+  PS1="${prompt}"
 }
 
-export PS1="$(git_prompt)"
+PROMPT_COMMAND=git_prompt
 
 #-------------------------------------------------------------
 # ENV vars
