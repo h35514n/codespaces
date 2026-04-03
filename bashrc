@@ -1,4 +1,18 @@
-#-------------------------------------------------------------
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SOURCE="${BASH_SOURCE[0]}"
+
+while [ -L "$SOURCE" ]; do
+  DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ "$SOURCE" != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+
+REPO_ROOT="$(cd -P "$(dirname "$SOURCE")" && pwd)"
+
+#------------------------------------------------------------- 
 # CONVENIENCE FUNCTIONS
 #-------------------------------------------------------------
 md() {
@@ -177,4 +191,4 @@ bind '"\e[B": history-search-forward'
 #-------------------------------------------------------------
 # INIT SCRIPTS
 #-------------------------------------------------------------
-fzf-completion-init
+. "${REPO_ROOT}/scripts/fzf-completion-init"

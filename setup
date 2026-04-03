@@ -2,9 +2,7 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-REPO_ROOT="${SCRIPT_DIR}"
-HOME_DIR="$HOME"
+REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 link_as_dotfile() {
   local src="${REPO_ROOT}/${1}"
