@@ -275,12 +275,6 @@ nnoremap <leader>- :wincmd _<CR>:wincmd \|<CR>
 " =: re-balance vim pane sizes
 nnoremap <leader>= :wincmd =<CR>
 
-" fs: save buffer
-nnoremap <silent><leader>fs :StripWhitespace<CR>:w<CR>
-
-" g: Git
-nnoremap <leader>g :Git<SPACE>
-
 " R: From visual mode, leader+R populates command line for search and replace
 vnoremap <leader>R y:%s/<C-R>"//g<LEFT><LEFT>
 
