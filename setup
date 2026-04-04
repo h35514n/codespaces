@@ -18,35 +18,40 @@ link_as_dotfile() {
   ln -s "${src}" "${dest}"
 }
 
-# --*-- Package Installations --*--
-if command -v apt-get >/dev/null 2>&1; then
-    sudo apt-get install -y \
-        btop \
-        build-essential \
-        ca-certificates \
-        containerd.io \
-        curl \
-        docker-buildx-plugin \
-        docker-ce \
-        docker-ce-cli \
-        docker-compose-plugin \
-        eza \
-        fd-find \
-        git \
-        git-delta \
-        gnupg \
-        jq \
-        lsb-release \
-        ripgrep \
-        tmux \
-        vim \
-        wget
+
+if [ "${CODESPACES:-}" = "true" ]; then
+  echo "-*- Running inside GitHub Codespaces -*-"
 fi
 
+if command -v apt-get >/dev/null 2>&1 && [ -z "${CODESPACES:-}" ]; then
+  # --*-- Package Installations --*--
+  sudo apt-get update
+  sudo apt-get install -y \
+    btop \
+    build-essential \
+    ca-certificates \
+    curl \
+    docker-ce \
+    docker-ce-cli \
+    docker-compose-plugin \
+    eza \
+    fd-find \
+    git \
+    git-delta \
+    gnupg \
+    jq \
+    ripgrep \
+    tmux \
+    vim \
+    wget
 
-# --*-- Package Installations: FZF --*--
-git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-~/.fzf/install
+  # --*-- Package Installations: FZF --*--
+  git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+  yes | ~/.fzf/install
+
+  # --*-- Link binaries --*--
+  ln -s "$(command -v fdfind)" ~/.bin/fd
+fi
 
 # --*-- Link config files --*--
 link_as_dotfile "bashrc"
@@ -54,11 +59,3 @@ link_as_dotfile "bin"
 link_as_dotfile "gitconfig"
 link_as_dotfile "tmux.conf"
 link_as_dotfile "vimrc"
-
-# --*-- Link binaries --*--
-ln -s "$(command -v fdfind)" ~/.bin/fd
-
-
-if [ "${CODESPACES:-}" = "true" ]; then
-  echo "-*- Running inside GitHub Codespaces -*-"
-fi
