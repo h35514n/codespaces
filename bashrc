@@ -143,6 +143,7 @@ export FZF_CTRL_T_COMMAND="${FZF_DEFAULT_COMMAND}"
 #-------------------------------------------------------------
 PATH="${HOME}/.bin"
 PATH+=":${HOME}/.bin/git"
+PATH+=":${HOME}/.fzf/bin"
 PATH+=":${HOME}/miniconda3/bin"
 PATH+=":${HOME}/miniconda3/condabin"
 PATH+=":/usr/local/sbin"
@@ -189,4 +190,4 @@ bind '"\e[B": history-search-forward'
 #-------------------------------------------------------------
 # INIT SCRIPTS
 #-------------------------------------------------------------
-. "${REPO_ROOT}/scripts/fzf-completion-init"
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
