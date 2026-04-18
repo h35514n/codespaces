@@ -61,12 +61,6 @@ set t_Co=256  " 256 color terminal
 set t_ZH=[3m
 set t_ZR=[23m
 
-if has('termguicolors')
-  set termguicolors
-endif
-
-set background=dark
-
 "comments in italics
 hi Comment cterm=italic
 " transparent background
