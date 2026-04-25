@@ -184,13 +184,13 @@ alias pp='pretty-print-path'  # Pretty-print PATH variable
 #-------------------------------------------------------------
 # SHELL CONFIG
 #-------------------------------------------------------------
-if [ -t 1 ]; then
-  bind "TAB:menu-complete"
-  bind "set show-all-if-ambiguous on"
-  bind "set completion-ignore-case on"
-  bind '"\e[A": history-search-backward'
-  bind '"\e[B": history-search-forward'
-fi
+# if [ -t 1 ]; then
+#   bind "TAB:menu-complete"
+#   bind "set show-all-if-ambiguous on"
+#   bind "set completion-ignore-case on"
+#   bind '"\e[A": history-search-backward'
+#   bind '"\e[B": history-search-forward'
+# fi
 
 #-------------------------------------------------------------
 # INIT SCRIPTS
